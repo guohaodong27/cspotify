@@ -153,7 +153,6 @@ void test_delete_playlist(void) {
     // the selected Playlist is the first Playlist
     // in the Library?
     // TODO: Add your test for Test 1
-    test_delete_track();
     Library testLibrary = create_library();
     add_playlist(testLibrary,"Favourites");   
     delete_playlist(testLibrary);
@@ -172,13 +171,6 @@ void test_delete_playlist(void) {
 //　Test function for 'delte_track'
 void test_delete_track(void){
 
-    // Test 1:Does delete_track work if
-    Library testLibrary = create_library();
-    add_playlist(testLibrary,"Favourites");   
-    add_track(testLibrary,"Five Hunderd Miles","Justin",206,0);
-    add_track(testLibrary,"Sold out","Justin",306,0);
-    delete_track(testLibrary,"Sold out");
-    print_library(testLibrary);
 }
 
 
@@ -208,12 +200,44 @@ void test_soundex_search(void) {
 > EXTRA
 *********/
 
+
+void test_cut_and_paste_track(int case_id);
+void test_add_filtered_playlist(int case_id);
 //  Your extra tests (Not worth marks)
 void extra_tests(void) {
-    // TODO: Add any extra tests you have here
+    int case_id =0;
+    test_add_filtered_playlist(case_id++);
+    test_cut_and_paste_track(case_id++);
+    test_delete_track();
+}
 
-    
-    printf("MEETS SPEC\n");
+void test_cut_and_paste_track(int case_id){
+    int res;
+    Library testLibrary = create_library();
+    add_playlist(testLibrary,"Favourites");   
+    add_playlist(testLibrary,"Favourites2");   
+    add_track(testLibrary,"Five Hunderd Miles","Justin",206,0);
+    add_track(testLibrary,"Sold out","Josten",306,0);
+    printf("Test cut_and_paste_track");
+    res = cut_and_paste_track(testLibrary,"Five Hunderd Miles","Favourites2");
+    if (res != SUCCESS){
+        printf("DOES NOT MEET SPEC %d",case_id++);
+    }
+}
+
+void test_add_filtered_playlist(int case_id){
+    int res;
+    Library testLibrary = create_library();
+    add_playlist(testLibrary,"Favourites");   
+    add_playlist(testLibrary,"Favourites2");   
+    add_track(testLibrary,"Five Hunderd Miles","Justin",206,0);
+    add_track(testLibrary,"Sold out","Josten",306,0);
+    add_track(testLibrary,"only my railgun","Koria",306,0);
+    printf("Test add_filtered_playlist");
+    res = add_filtered_playlist(testLibrary,"Justin");
+    if (res != SUCCESS){
+        printf("DOES NOT MEET SPEC %d",case_id++);
+    }
 }
 
 /*****************

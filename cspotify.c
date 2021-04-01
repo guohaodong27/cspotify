@@ -425,22 +425,26 @@ int add_filtered_playlist(Library library, char artist[MAX_LEN]) {
     char sound[MAX_LEN];
         map(artist,sound);
         Playlist playlist = library->head;
-        while (playlist != NULL)
+        while (playlist->next != NULL)
         {
             Track track = playlist->tracks;
-            Track pre;
+            Track pre = NULL;
             while (track != NULL)
             {
                 char s_artist[MAX_LEN];
                 map(track->artist,s_artist);
-                if(s_artist == sound){
+                if(!strcmp(s_artist,sound)){
                     if(library->last->tracks == NULL){
                         // add to playlist
                         library->last->tracks = track;
                         append_track = library->last->tracks;
+                    }else{
+                        append_track->next = track;
                     }
-                    append_track->next = track;
-                    // delete old track
+                }
+                if (pre == NULL){
+                    playlist->tracks = track->next;
+                }else{
                     pre->next = track->next;
                 }
                 pre = track;
