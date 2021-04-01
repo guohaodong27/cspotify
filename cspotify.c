@@ -138,7 +138,7 @@ void print_library(Library library) {
 int rename_playlist(Library library, char playlistName[MAX_LEN],
     char newPlaylistName[MAX_LEN]) {
     Playlist cur = library->head;
-    while (cur != NULL && !strcmp(cur->name,playlistName)) {
+    while (cur != NULL && strcmp(cur->name,playlistName)) {
         cur = cur->next;
     }
     if (cur == NULL) {
