@@ -124,8 +124,8 @@ void test_playlist_length(void) {
     // with lengths greater than 60 seconds?
     // TODO: Add your test for Test 1
     Library testLibrary = create_library();
-    
-
+    add_playlist(testLibrary,"Favourites");   
+    add_track(testLibrary,"Five Hunderd Miles","Justin",206,0);
     // Test 2: ???
     // TODO: Add your own test, and explain it.
 
