@@ -158,12 +158,20 @@ int rename_playlist(Library library, char playlistName[MAX_LEN],
 void select_next_playlist(Library library) {
     // check Playlist is not null
     Playlist playlist = library->head;
-    while (playlist != NULL){
-        if (playlist->isSelected) {
-            playlist->isSelected = FALSE;
-            playlist->next->isSelected = TRUE;
-        }
+    while (playlist != NULL && !playlist->isSelected){
         playlist = playlist->next;
+    }
+    if (playlist == NULL){
+        return;
+    }
+    playlist->isSelected = FALSE;
+    // in case of no next playlist
+    if (playlist->next == NULL){
+        library->head->isSelected = TRUE;
+        library->selected = library->head;
+    }else{
+        playlist->next->isSelected = TRUE;
+        library->selected = playlist->next;
     }
 }
 
@@ -174,15 +182,19 @@ void select_previous_playlist(Library library) {
     if (cur == NULL) {
         return;
     }
+    if(cur->isSelected){
+        cur->isSelected = FALSE;
+        library->last->isSelected = TRUE;
+        library->selected = library->last;
+    }
     Playlist next = cur->next;
-    while (next != NULL){
-        if (next->isSelected) {
-            next->isSelected = FALSE;
-            cur->isSelected = TRUE;
-        }
+    while (next != NULL && !next->isSelected){
         cur = next;
         next = next->next;
     }
+    next->isSelected = FALSE;
+    cur->isSelected = TRUE;
+    library->selected = cur;
 }
 
 // Add a new Track to the selected Playlist.
@@ -287,6 +299,7 @@ Playlist cur = library->head;
         free(tmp);
         // select next playlist
         cur->isSelected = TRUE;
+        library->selected = cur;
 }
 
 // Delete an entire Library and its associated Playlists and Tracks.
