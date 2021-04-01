@@ -206,19 +206,25 @@ int add_track(Library library, char title[MAX_LEN], char artist[MAX_LEN],
         for(int i = 0;i<position;i++){
             insterPosition = insterPosition->next;
         }
-        // find last track
-        Track cur = insterPosition->tracks;
-        while (cur->next != NULL)
-        {
-            cur = cur->next;
-        }
+        // init track
         Track insertT = malloc(sizeof(struct track));
         strcpy(insertT->title,title);
         strcpy(insertT->artist,artist);
         struct trackLength len;
-        len.seconds = trackLengthInSec;
+        len.seconds = trackLengthInSec%60;
+        len.minutes = trackLengthInSec/60;
         insertT->length = len;
-        
+        // find last track
+        Track cur = insterPosition->tracks;
+        if (cur == NULL){
+            insterPosition->tracks = insertT;
+            return SUCCESS;
+        }
+        while (cur->next != NULL)
+        {
+            cur = cur->next;
+        }
+        cur->next = insertT;
     return SUCCESS;
 }
 
@@ -226,13 +232,13 @@ int add_track(Library library, char title[MAX_LEN], char artist[MAX_LEN],
 void playlist_length(Library library, int *playlistMinutes, int *playlistSeconds) {
     Playlist cur = library->head;
     int i =0;
-    while (cur->next != NULL)
+    while (cur != NULL)
     {
         Track curT = cur->tracks;
         while (curT != NULL)
         {
-            playlistMinutes[i]+= curT->length.minutes;
-            playlistSeconds[i]+= curT->length.seconds;
+            (*playlistMinutes)+= curT->length.minutes;
+            *playlistSeconds+= curT->length.seconds;
             curT=curT->next;
         }
         cur = cur->next;
@@ -253,13 +259,20 @@ void delete_track(Library library, char track[MAX_LEN]) {
         if (cur->isSelected)
         {
             Track curT = cur->tracks;
+            if (curT != NULL && !strcmp(curT->title,track)){
+                cur->tracks = curT->next;
+                free(curT);
+                return;
+            }
+            Track pre = curT;
+            curT = curT->next;
             while (curT != NULL)
             {
-                if (strcmp(curT->title,track))
+                if (!strcmp(curT->title,track))
                 {
-                    Track tmp = curT;
-                    curT=curT->next;
+                    pre->next = curT->next;
                     free(curT);
+                    return;
                 }
                 curT = curT->next;
             }
@@ -275,16 +288,27 @@ void delete_track(Library library, char track[MAX_LEN]) {
 // Delete the selected Playlist and select the next Playlist in the Library.
 void delete_playlist(Library library) {
 Playlist cur = library->head;
+    if (cur != NULL && cur->isSelected){
+        library->head = cur->next;
+        library->selected = cur->next;
+        Playlist newLast = library->head;
+        while (newLast != NULL && newLast->next != NULL)
+        {
+            newLast = newLast->next;
+        }
+        library->last = newLast;
+        free(cur);
+        return;
+    }
+    Playlist pre = cur;
+    cur = cur->next;
     while (cur != NULL && !cur->isSelected)
     {
         cur = cur->next;
     }
-        // delete selected playlist
-        Playlist tmp = cur;
-        cur = cur->next;
         // free mem
-        if (tmp->tracks != NULL){
-            Track curT = tmp->tracks;
+        if (cur->tracks != NULL){
+            Track curT = cur->tracks;
             Track nextT = curT->next;
             while (curT != NULL)
             {
@@ -295,11 +319,13 @@ Playlist cur = library->head;
                 }
             }
         }
-        
-        free(tmp);
+        pre->next = cur->next;
+        free(cur);
         // select next playlist
-        cur->isSelected = TRUE;
-        library->selected = cur;
+        if (cur != NULL){
+            cur->isSelected = TRUE;
+            library->selected = cur;
+        }
 }
 
 // Delete an entire Library and its associated Playlists and Tracks.
@@ -375,7 +401,7 @@ void soundex_search(Library library, char artist[MAX_LEN]) {
             {
                 char s_artist[MAX_LEN];
                 map(track->artist,s_artist);
-                if(s_artist == sound){
+                if(!strcmp(sound,s_artist)){
                     print_track(track->title,track->artist,track->length.minutes,track->length.seconds);
                 }
                 track = track->next;
@@ -427,7 +453,25 @@ int add_filtered_playlist(Library library, char artist[MAX_LEN]) {
 
 // Reorder the selected Playlist in the given order specified by the order array.
 void reorder_playlist(Library library, int order[MAX_LEN], int length) {
-    
+    Playlist order_node[MAX_LEN];
+    Playlist cur = library->head;
+    if (cur == NULL){
+        return;
+    }
+    for(int i = 0;i< length+1;i++){
+        order_node[i] = cur;
+        cur = cur->next;
+    }
+    Playlist reordered_node[MAX_LEN];\
+    for(int i =0;i<length;i++){
+        reordered_node[i] = order_node[order[i]];
+    }
+    reordered_node[length] = order_node[length];
+    library->head = reordered_node[0];
+    Playlist head = library->head;
+    for(int i = 1;i<length+1;i++){
+        head->next = reordered_node[i];
+    }
 }
 
 
@@ -450,17 +494,25 @@ static void print_track(char title[MAX_LEN], char artist[MAX_LEN], int minutes, 
 
 
 
-static void map(char i[MAX_LEN],char res[MAX_LEN]){
+static void map(char* i,char* res){
     char map[] = {'0','1','2','3','0','1','2','0','0','2','2','4','5','5','0','1','2','6','2','3','0','1','0','2','0','2'};
     int index = 0;
+    char tmp_array[MAX_LEN];
     while (i[index] != '\0')
     {
-        if (i[index]<97)
+        if ('A'<=i[index]&&i[index]<='Z')
         {
-            i[index]=i[index]+31;
+            tmp_array[index]=i[index]+32;
+        }else{
+            tmp_array[index] = i[index];
         }
-        char tmp = map[i[index]-'a'];
-        if(index-1>-1&& res[index-1] != tmp){
+        index++;
+    }
+    index = 0;
+    while (tmp_array[index] != '\0')
+    {
+        char tmp = map[tmp_array[index]-'a'];
+        if(index == 0 || index>0 && res[index-1] != tmp){
             res[index] = tmp;
         }
         index++;

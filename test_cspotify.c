@@ -81,7 +81,7 @@ void test_rename_playlist(void) {
     // TODO: Add your test for Test 2
     add_playlist(testLibrary,"Favourites");   
     int result2 = rename_playlist(testLibrary, "Favourites", "Dislikes");
-    if (result != SUCCESS) {
+    if (result != ERROR_NOT_FOUND) {
         printf("DOES NOT MEET SPEC\n");
         return;
     }
@@ -126,6 +126,15 @@ void test_playlist_length(void) {
     Library testLibrary = create_library();
     add_playlist(testLibrary,"Favourites");   
     add_track(testLibrary,"Five Hunderd Miles","Justin",206,0);
+    add_track(testLibrary,"Sold out","Justin",306,0);
+    int second = 0;
+    int minitus = 0;
+    playlist_length(testLibrary,&minitus,&second);
+    if (!(second == 32 && minitus == 8)){
+        printf("DOES NOT MEET SPEC\n");
+    }
+
+
     // Test 2: ???
     // TODO: Add your own test, and explain it.
 
@@ -138,16 +147,38 @@ void test_playlist_length(void) {
 *********/
 
 // Test function for 'delete_playlist'
+void test_delete_track(void);
 void test_delete_playlist(void) {
     // Test 1: Does delete_playlist work if
     // the selected Playlist is the first Playlist
     // in the Library?
     // TODO: Add your test for Test 1
+    test_delete_track();
+    Library testLibrary = create_library();
+    add_playlist(testLibrary,"Favourites");   
+    delete_playlist(testLibrary);
+    int res = rename_playlist(testLibrary,"Favourites","test");
+    if (res != ERROR_NOT_FOUND){
+        printf("DOES NOT MEET SPEC\n");
+    }
+
 
     // Test 2: ???
     // TODO: Add your own test, and explain it.
 
     printf("MEETS SPEC\n");
+}
+
+//　Test function for 'delte_track'
+void test_delete_track(void){
+
+    // Test 1:Does delete_track work if
+    Library testLibrary = create_library();
+    add_playlist(testLibrary,"Favourites");   
+    add_track(testLibrary,"Five Hunderd Miles","Justin",206,0);
+    add_track(testLibrary,"Sold out","Justin",306,0);
+    delete_track(testLibrary,"Sold out");
+    print_library(testLibrary);
 }
 
 
@@ -159,6 +190,12 @@ void test_delete_playlist(void) {
 void test_soundex_search(void) {
     // Test 1: ???
     // TODO: Add your own test, and explain it.
+    Library testLibrary = create_library();
+    add_playlist(testLibrary,"Favourites");   
+    add_track(testLibrary,"Five Hunderd Miles","Justin",206,0);
+    add_track(testLibrary,"Sold out","Josten",306,0);
+    printf("\n");
+    soundex_search(testLibrary,"Justin");
 
     // Test 2: ???
     // TODO: Add your own test, and explain it.
@@ -174,6 +211,8 @@ void test_soundex_search(void) {
 //  Your extra tests (Not worth marks)
 void extra_tests(void) {
     // TODO: Add any extra tests you have here
+
+    
     printf("MEETS SPEC\n");
 }
 

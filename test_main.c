@@ -38,6 +38,7 @@ int main(void) {
 
     printf("Stage 3 - Test delete_playlist: ");
     test_delete_playlist();
+    
 
     printf("Stage 4 - Test soundex_search: ");
     test_soundex_search();
