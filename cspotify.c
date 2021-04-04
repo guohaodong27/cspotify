@@ -42,6 +42,7 @@ struct playlist {
     struct track *tracks;
     struct playlist *next;
     int isSelected;
+    int padding;
 };
 
 // 'struct trackLength' represents the length of a track. 
@@ -100,6 +101,8 @@ int add_playlist(Library library, char playlistName[MAX_LEN]) {
     Playlist newPlaylist = malloc(sizeof(struct playlist));
     strcpy(newPlaylist->name,playlistName);
     newPlaylist->isSelected = FALSE;
+    newPlaylist->next = NULL;
+    newPlaylist->tracks = NULL;
     // append to the end of liberary
     if (library->head == NULL) {
         newPlaylist->isSelected = TRUE;
@@ -108,6 +111,12 @@ int add_playlist(Library library, char playlistName[MAX_LEN]) {
     }else{
         library->selected =newPlaylist;
         Playlist cur = library->head;
+        Playlist next = cur->next;
+        while (next != NULL)
+        {
+            next = next->next;
+        }
+        
         while (cur->next != NULL) {
             cur = cur->next;
         }
@@ -218,6 +227,7 @@ int add_track(Library library, char title[MAX_LEN], char artist[MAX_LEN],
         Track insertT = malloc(sizeof(struct track));
         strcpy(insertT->title,title);
         strcpy(insertT->artist,artist);
+        insertT->next = NULL;
         struct trackLength len;
         len.seconds = trackLengthInSec%60;
         len.minutes = trackLengthInSec/60;
@@ -565,6 +575,7 @@ static void map(char* i,char* res){
     
     // conver any character to lowcase
     char tmp_array[MAX_LEN];
+    memset(tmp_array,0,MAX_LEN);
     while (i[index] != '\0')
     {
         if ('A'<=i[index]&&i[index]<='Z')
