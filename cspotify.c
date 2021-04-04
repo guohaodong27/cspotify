@@ -92,7 +92,6 @@ Library create_library(void) {
 
 // Add a new Playlist to the Library.
 // TODO: del
-// 添加列表
 int add_playlist(Library library, char playlistName[MAX_LEN]) {
     if (!is_valid(playlistName)){
         return ERROR_INVALID_INPUTS;
@@ -107,7 +106,6 @@ int add_playlist(Library library, char playlistName[MAX_LEN]) {
         library->selected = newPlaylist;
         library->head = newPlaylist;
     }else{
-        newPlaylist->isSelected = FALSE;
         library->selected =newPlaylist;
         Playlist cur = library->head;
         while (cur->next != NULL) {
@@ -121,11 +119,21 @@ int add_playlist(Library library, char playlistName[MAX_LEN]) {
 
 // Print out the Library.
 void print_library(Library library) {
+    if (library == NULL){
+        return;
+    }
     Playlist cur = library->head;
     int index = 0;
     while (cur!=NULL) {
         if (cur->isSelected) {
             print_selected_playlist(index,cur->name);
+            Track curT = cur->tracks;
+            while (curT != NULL)
+            {
+                print_track(curT->title,curT->artist,curT->length.minutes,curT->length.seconds);
+                curT = curT->next;
+            }
+            
         } else{
             print_playlist(index,cur->name);
         }
@@ -230,8 +238,9 @@ int add_track(Library library, char title[MAX_LEN], char artist[MAX_LEN],
 
 // Calculate the total length of the selected Playlist in minutes and seconds.
 void playlist_length(Library library, int *playlistMinutes, int *playlistSeconds) {
+    *playlistMinutes = 0;
+    *playlistSeconds = 0;
     Playlist cur = library->head;
-    int i =0;
     while (cur != NULL)
     {
         Track curT = cur->tracks;
@@ -364,26 +373,57 @@ void delete_library(Library library) {
 int cut_and_paste_track(Library library, char trackTitle[MAX_LEN], 
     char destPlaylist[MAX_LEN]) {
         Playlist curP = library->head;
+        // find selected list
         while (curP != NULL && !curP->isSelected)
         {
             curP = curP->next;
         }
         Track curT = curP->tracks;
-        while (curT!=NULL && !strcmp(curT->title,trackTitle))
+        Track preT = NULL;
+        // find track
+        while (curT!=NULL && strcmp(curT->title,trackTitle))
         {
+            preT = curT;
             curT = curT->next;
         }
-        curP = library->head;
-        while (curP != NULL && !strcmp(curP->name,destPlaylist))
-        {
-            curP = curP->next;
+        if (curT == NULL){
+            return ERROR_NOT_FOUND;
         }
-        Track insertT = curP->tracks;
-        while (insertT != NULL && insertT->next == NULL)
+        
+
+        Playlist destP;
+        destP = library->head;
+        // find dest playlist
+        while (destP!= NULL && strcmp(destP->name,destPlaylist))
+        {
+            destP= destP->next;
+        }
+        // not found destination
+        if (destP== NULL){
+            return ERROR_NOT_FOUND;
+        }
+
+        // del track
+            // del first node
+        if (curT != NULL && preT == NULL){
+            curP->tracks = curT->next;
+        }else{
+
+            // del node which not at first
+            preT->next = curT->next;
+        }
+
+        Track insertT = destP->tracks;
+        if (insertT == NULL){
+            curT->next = NULL;
+            destP->tracks = curT;
+            return SUCCESS;
+        }
+        while (insertT != NULL && insertT->next != NULL)
         {
             insertT = insertT->next;
         }
-        curT->next = insertT->next;
+        curT->next = NULL;
         insertT->next = curT;
     return SUCCESS;
 }
@@ -421,7 +461,8 @@ void soundex_search(Library library, char artist[MAX_LEN]) {
 int add_filtered_playlist(Library library, char artist[MAX_LEN]) {
     // add a new playlist to save Soundex
     add_playlist(library,artist);
-    Track append_track;
+    // append_track record append position
+    Track append_track = NULL;
     char sound[MAX_LEN];
         map(artist,sound);
         Playlist playlist = library->head;
@@ -457,24 +498,42 @@ int add_filtered_playlist(Library library, char artist[MAX_LEN]) {
 
 // Reorder the selected Playlist in the given order specified by the order array.
 void reorder_playlist(Library library, int order[MAX_LEN], int length) {
-    Playlist order_node[MAX_LEN];
-    Playlist cur = library->head;
-    if (cur == NULL){
+    Track order_node[MAX_LEN];
+    Playlist curP = library->head;
+    // in case of library is null
+    if (curP == NULL){
         return;
     }
-    for(int i = 0;i< length+1;i++){
+    while (curP != NULL && !curP->isSelected)
+    {
+        curP = curP->next;
+    }
+
+    // reorder nodes
+    Track cur = curP->tracks;
+    for(int i = 0;i< length;i++){
+        if (cur == NULL){
+            return ;
+        }
         order_node[i] = cur;
         cur = cur->next;
     }
-    Playlist reordered_node[MAX_LEN];\
+    order_node[length] = cur;
+
+    // map order
+    Track reordered_node[MAX_LEN];
     for(int i =0;i<length;i++){
         reordered_node[i] = order_node[order[i]];
     }
+    // append last->next
     reordered_node[length] = order_node[length];
-    library->head = reordered_node[0];
-    Playlist head = library->head;
+
+    // link ordered node
+    library->selected->tracks = reordered_node[0];
+    Track head = library->selected->tracks;
     for(int i = 1;i<length+1;i++){
         head->next = reordered_node[i];
+        head = reordered_node[i];
     }
 }
 
@@ -498,9 +557,13 @@ static void print_track(char title[MAX_LEN], char artist[MAX_LEN], int minutes, 
 
 
 
+// map character to numver to realize soundex
 static void map(char* i,char* res){
     char map[] = {'0','1','2','3','0','1','2','0','0','2','2','4','5','5','0','1','2','6','2','3','0','1','0','2','0','2'};
+
     int index = 0;
+    
+    // conver any character to lowcase
     char tmp_array[MAX_LEN];
     while (i[index] != '\0')
     {
@@ -512,15 +575,21 @@ static void map(char* i,char* res){
         }
         index++;
     }
+
+    // tmp_array index
     index = 0;
+    // res index,because res's length is not eq to origin array
+    int res_index =0;
     while (tmp_array[index] != '\0')
     {
-        char tmp = map[tmp_array[index]-'a'];
-        if(index == 0 || index>0 && res[index-1] != tmp){
-            res[index] = tmp;
+        char tmp = map[tmp_array[index]-'a'+1];
+        if(index == 0 || (index>0 && res[res_index-1] != tmp)){
+            res[res_index] = tmp;
+            res_index++;
         }
         index++;
     }
+    res[index]='\0';
 }
 
 static int is_valid(char name[MAX_LEN]){

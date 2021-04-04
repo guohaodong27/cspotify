@@ -56,8 +56,12 @@ void test_add_playlist(void) {
         return;
     }
 
-    // Test 3: ???
-    // TODO: Add your own test, and explain it.
+    // Test 3: add a same list again
+    int result3 = add_playlist(testLibrary, "Favourites");
+    if (result3 != SUCCESS) {
+        printf("DOES NOT MEET SPEC\n");
+        return;
+    }
 
     printf("MEETS SPEC\n");
 }
@@ -81,7 +85,7 @@ void test_rename_playlist(void) {
     // TODO: Add your test for Test 2
     add_playlist(testLibrary,"Favourites");   
     int result2 = rename_playlist(testLibrary, "Favourites", "Dislikes");
-    if (result != ERROR_NOT_FOUND) {
+    if (result2 != SUCCESS) {
         printf("DOES NOT MEET SPEC\n");
         return;
     }
@@ -104,7 +108,6 @@ void test_add_track(void) {
     // Test 1: Does add_track successfully add 
     // multiple (more than 3 Tracks) Tracks 
     // to the Library?
-    // TODO: Add your test for Test 1
     Library testLibrary = create_library();
     add_playlist(testLibrary,"Favourites");   
     int result = add_track(testLibrary,"Five Hunderd Miles","Justin",206,0);
@@ -112,8 +115,6 @@ void test_add_track(void) {
         printf("DOES NOT MEET SPEC\n");
         return;
     }
-    // Test 2: ???
-    // TODO: Add your own test, and explain it.
 
     printf("MEETS SPEC\n");
 }
@@ -203,14 +204,18 @@ void test_soundex_search(void) {
 
 void test_cut_and_paste_track(int case_id);
 void test_add_filtered_playlist(int case_id);
+void test_reorder(int case_id);
 //  Your extra tests (Not worth marks)
 void extra_tests(void) {
     int case_id =0;
     test_add_filtered_playlist(case_id++);
     test_cut_and_paste_track(case_id++);
     test_delete_track();
+    test_reorder(case_id++);
 }
 
+// Test cut and paste
+// move to a exist playlist
 void test_cut_and_paste_track(int case_id){
     int res;
     Library testLibrary = create_library();
@@ -225,6 +230,9 @@ void test_cut_and_paste_track(int case_id){
     }
 }
 
+// Test cut and paste
+// 
+
 void test_add_filtered_playlist(int case_id){
     int res;
     Library testLibrary = create_library();
@@ -238,6 +246,20 @@ void test_add_filtered_playlist(int case_id){
     if (res != SUCCESS){
         printf("DOES NOT MEET SPEC %d",case_id++);
     }
+}
+
+void test_reorder(int case_id){
+    Library testLibrary = create_library();
+    add_playlist(testLibrary,"Favourites");   
+    add_track(testLibrary,"Five Hunderd Miles","Justin",206,0);
+    add_track(testLibrary,"Sold out","Josten",306,0);
+    add_track(testLibrary,"only my railgun","Koria",306,0);
+    int order[] = {2 ,1 ,0};
+    reorder_playlist(testLibrary,order,3);
+    printf("\n");
+    print_library(testLibrary);
+
+
 }
 
 /*****************
