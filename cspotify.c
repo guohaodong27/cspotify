@@ -273,16 +273,20 @@ void playlist_length(Library library, int *playlistMinutes, int *playlistSeconds
 // of the Library.
 void delete_track(Library library, char track[MAX_LEN]) {
     Playlist cur = library->head;
+    
+    // find the selected_list
     while (cur != NULL)
     {
         if (cur->isSelected)
         {
             Track curT = cur->tracks;
+            // if curT is a head_node
             if (curT != NULL && !strcmp(curT->title,track)){
                 cur->tracks = curT->next;
                 free(curT);
                 return;
             }
+            // if curT is not the head_node
             Track pre = curT;
             curT = curT->next;
             while (curT != NULL)
@@ -295,10 +299,8 @@ void delete_track(Library library, char track[MAX_LEN]) {
                 }
                 curT = curT->next;
             }
-            
         }
         cur = cur->next;
-        
     }
     
 
@@ -367,10 +369,9 @@ void delete_library(Library library) {
                 }
             }
         }
-        
         free(tmp);
-        cur = cur->next;
     }
+    free(library);
 }
 
 

@@ -62,7 +62,7 @@ void test_add_playlist(void) {
         printf("DOES NOT MEET SPEC\n");
         return;
     }
-
+    delete_library(testLibrary);
     printf("MEETS SPEC\n");
 }
 
@@ -94,7 +94,7 @@ void test_rename_playlist(void) {
 
     // Test 3: ???
     // TODO: Add your own test, and explain it.
-
+    delete_library(testLibrary);
     printf("MEETS SPEC\n");
 }
 
@@ -115,7 +115,7 @@ void test_add_track(void) {
         printf("DOES NOT MEET SPEC\n");
         return;
     }
-
+    delete_library(testLibrary);
     printf("MEETS SPEC\n");
 }
 
@@ -138,7 +138,7 @@ void test_playlist_length(void) {
 
     // Test 2: ???
     // TODO: Add your own test, and explain it.
-
+    delete_library(testLibrary);
     printf("MEETS SPEC\n");
 }
 
@@ -165,7 +165,7 @@ void test_delete_playlist(void) {
 
     // Test 2: ???
     // TODO: Add your own test, and explain it.
-
+    delete_library(testLibrary);
     printf("MEETS SPEC\n");
 }
 
@@ -192,7 +192,7 @@ void test_soundex_search(void) {
 
     // Test 2: ???
     // TODO: Add your own test, and explain it.
-
+    delete_library(testLibrary);
     printf("MEETS SPEC\n");
 }
 
@@ -228,6 +228,7 @@ void test_cut_and_paste_track(int case_id){
     if (res != SUCCESS){
         printf("DOES NOT MEET SPEC %d",case_id++);
     }
+    delete_library(testLibrary);
 }
 
 // Test cut and paste
@@ -246,6 +247,7 @@ void test_add_filtered_playlist(int case_id){
     if (res != SUCCESS){
         printf("DOES NOT MEET SPEC %d",case_id++);
     }
+    delete_library(testLibrary);
 }
 
 void test_reorder(int case_id){
@@ -258,7 +260,7 @@ void test_reorder(int case_id){
     reorder_playlist(testLibrary,order,3);
     printf("\n");
     print_library(testLibrary);
-
+    delete_library(testLibrary);
 
 }
 
