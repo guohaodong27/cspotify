@@ -256,6 +256,13 @@ void playlist_length(Library library, int *playlistMinutes, int *playlistSeconds
     *playlistMinutes = 0;
     *playlistSeconds = 0;
     Playlist cur = library->head;
+
+    // if playlist is empty
+    if(cur == NULL){
+        *playlistMinutes = -1;
+        *playlistSeconds = -1;
+    }
+    
     while (cur != NULL)
     {
         Track curT = cur->tracks;
