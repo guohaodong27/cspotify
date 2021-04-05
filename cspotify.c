@@ -237,6 +237,7 @@ void select_previous_playlist(Library library)
         cur->isSelected = FALSE;
         library->last->isSelected = TRUE;
         library->selected = library->last;
+        return;
     }
     Playlist next = cur->next;
     while (next != NULL && !next->isSelected)
