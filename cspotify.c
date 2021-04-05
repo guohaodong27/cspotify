@@ -226,8 +226,17 @@ void select_previous_playlist(Library library) {
 // Add a new Track to the selected Playlist.
 int add_track(Library library, char title[MAX_LEN], char artist[MAX_LEN], 
     int trackLengthInSec, int position) {
+
+        // check title and artist if invalid
+        if (!is_valid(title)||!is_valid(artist)){
+            return ERROR_INVALID_INPUTS;
+        }
+
         // notice the playlist may be null
         Playlist insterPosition = library->head;
+        if (insterPosition == NULL){
+            return ERROR_NOT_FOUND;
+        }
         // find playlist
         for(int i = 0;i<position;i++){
             insterPosition = insterPosition->next;
