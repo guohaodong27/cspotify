@@ -361,6 +361,11 @@ void delete_track(Library library, char track[MAX_LEN])
         if (cur->isSelected)
         {
             Track curT = cur->tracks;
+            
+            // if selected list have not any tracks
+            if (curT == NULL){
+                return;
+            }
             // if curT is a head_node
             if (curT != NULL && !strcmp(curT->title, track))
             {
@@ -408,7 +413,7 @@ void delete_playlist(Library library)
         }
         library->last = newLast;
 
-        // update selected playlist
+        // update selected point
         if (library->selected != NULL)
         {
             library->selected->isSelected = TRUE;
@@ -432,10 +437,12 @@ void delete_playlist(Library library)
         free(cur);
         return;
     }
+
     Playlist pre = cur;
     cur = cur->next;
     while (cur != NULL && !cur->isSelected)
     {
+        pre = cur;
         cur = cur->next;
     }
     // free mem
@@ -454,13 +461,15 @@ void delete_playlist(Library library)
         }
     }
     pre->next = cur->next;
+    cur->next->isSelected = TRUE;
+    library->selected = cur->next;
     free(cur);
     // select next playlist
-    if (cur != NULL)
-    {
-        cur->isSelected = TRUE;
-        library->selected = cur;
-    }
+    // if (cur != NULL)
+    // {
+    //     cur->isSelected = TRUE;
+    //     library->selected = cur;
+    // }
 }
 
 // Delete an entire Library and its associated Playlists and Tracks.
