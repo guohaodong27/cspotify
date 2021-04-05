@@ -274,7 +274,7 @@ int add_track(Library library, char title[MAX_LEN], char artist[MAX_LEN],
         return ERROR_INVALID_INPUTS;
     }
     // find playlist
-    for (int i = 0; i < position; i++)
+    for (int i = 0; i < position && insterPosition != NULL; i++)
     {
         insterPosition = insterPosition->next;
     }    
