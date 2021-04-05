@@ -214,7 +214,11 @@ void select_previous_playlist(Library library) {
         cur = next;
         next = next->next;
     }
-    next->isSelected = FALSE;
+
+    // in case of next is null only a playlist
+    if (next != NULL){
+        next->isSelected = FALSE;
+    }
     cur->isSelected = TRUE;
     library->selected = cur;
 }
@@ -262,7 +266,7 @@ void playlist_length(Library library, int *playlistMinutes, int *playlistSeconds
         *playlistMinutes = -1;
         *playlistSeconds = -1;
     }
-    
+
     while (cur != NULL)
     {
         Track curT = cur->tracks;
@@ -273,6 +277,10 @@ void playlist_length(Library library, int *playlistMinutes, int *playlistSeconds
             curT=curT->next;
         }
         cur = cur->next;
+    }
+    if (*playlistSeconds > 59){
+        *playlistMinutes = *playlistSeconds/60;
+        *playlistSeconds = *playlistSeconds%60;
     }
 }
 
