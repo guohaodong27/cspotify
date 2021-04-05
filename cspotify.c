@@ -154,6 +154,11 @@ void print_library(Library library) {
 // Rename the name of an existing Playlist.
 int rename_playlist(Library library, char playlistName[MAX_LEN],
     char newPlaylistName[MAX_LEN]) {
+
+    // check newplaylist name
+    if (!is_valid(newPlaylistName)){
+        return ERROR_INVALID_INPUTS;
+    }
     Playlist cur = library->head;
     while (cur != NULL && strcmp(cur->name,playlistName)) {
         cur = cur->next;
@@ -609,7 +614,7 @@ static int is_valid(char name[MAX_LEN]){
     while (name[index] != '\0' && index < MAX_LEN)
     {
         char cur = name[index];
-        if(!((cur >= 'A' && cur <= 'Z')||(cur >='a' && cur <= 'z')||(cur >'0' && cur < '9'))){
+        if(!((cur >= 'A' && cur <= 'Z')||(cur >='a' && cur <= 'z')||(cur >='0' && cur <= '9'))){
             return FALSE;
         }
         index++;
