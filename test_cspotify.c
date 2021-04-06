@@ -110,7 +110,7 @@ void test_add_track(void) {
     // to the Library?
     Library testLibrary = create_library();
     add_playlist(testLibrary,"Favourites");   
-    int result = add_track(testLibrary,"Five Hunderd Miles","Justin",206,0);
+    int result = add_track(testLibrary,"FiveHunderdMiles","Justin",206,0);
     if (result != SUCCESS) {
         printf("DOES NOT MEET SPEC\n");
         return;
@@ -126,8 +126,8 @@ void test_playlist_length(void) {
     // TODO: Add your test for Test 1
     Library testLibrary = create_library();
     add_playlist(testLibrary,"Favourites");   
-    add_track(testLibrary,"Five Hunderd Miles","Justin",206,0);
-    add_track(testLibrary,"Sold out","Justin",306,0);
+    add_track(testLibrary,"FiveHunderdMiles","Justin",206,0);
+    add_track(testLibrary,"Soldout","Justin",306,0);
     int second = 0;
     int minitus = 0;
     playlist_length(testLibrary,&minitus,&second);
@@ -187,7 +187,6 @@ void test_soundex_search(void) {
     add_playlist(testLibrary,"Favourites");   
     add_track(testLibrary,"Five Hunderd Miles","Justin",206,0);
     add_track(testLibrary,"Sold out","Josten",306,0);
-    printf("\n");
     soundex_search(testLibrary,"Justin");
 
     // Test 2: ???

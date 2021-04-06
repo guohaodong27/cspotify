@@ -160,6 +160,12 @@ void print_library(Library library)
         else
         {
             print_playlist(index, cur->name);
+            Track curT = cur->tracks;
+            while (curT != NULL)
+            {
+                print_track(curT->title, curT->artist, curT->length.minutes, curT->length.seconds);
+                curT = curT->next;
+            }
         }
         cur = cur->next;
         index++;
@@ -260,7 +266,6 @@ int add_track(Library library, char title[MAX_LEN], char artist[MAX_LEN],
               int trackLengthInSec, int position)
 {
 
-
     // notice the playlist may be null
     Playlist insterPosition = library->head;
     if (insterPosition == NULL)
@@ -274,14 +279,9 @@ int add_track(Library library, char title[MAX_LEN], char artist[MAX_LEN],
         return ERROR_INVALID_INPUTS;
     }
     // find playlist
-    for (int i = 0; i < position && insterPosition != NULL; i++)
+    while (insterPosition != NULL && !insterPosition->isSelected)
     {
         insterPosition = insterPosition->next;
-    }    
-
-    if (insterPosition == NULL)
-    {
-        return ERROR_NOT_FOUND;
     }
 
     // init track
@@ -293,18 +293,32 @@ int add_track(Library library, char title[MAX_LEN], char artist[MAX_LEN],
     len.seconds = trackLengthInSec % 60;
     len.minutes = trackLengthInSec / 60;
     insertT->length = len;
-    // find last track
-    Track cur = insterPosition->tracks;
-    if (cur == NULL)
+
+    // find insert point
+    Track insertPointPre = insterPosition->tracks;
+    Track insertPointAfter = insterPosition->tracks;
+    if (insertPointPre != NULL)
+    {
+        insertPointAfter = insterPosition->tracks->next;
+        for (int i = 1; i < position && insertPointPre != NULL; i++)
+        {
+            insertPointPre = insertPointAfter;
+            if (insertPointAfter != NULL){
+                insertPointAfter = insertPointAfter->next;
+            }
+        }
+        // don't find insert point (the length greater than len)
+        if (insertPointPre == NULL){
+            return ERROR_INVALID_INPUTS;
+        }
+        insertPointPre->next = insertT;
+    }
+    else
     {
         insterPosition->tracks = insertT;
-        return SUCCESS;
     }
-    while (cur->next != NULL)
-    {
-        cur = cur->next;
-    }
-    cur->next = insertT;
+    insertT->next = insertPointAfter;
+
     return SUCCESS;
 }
 
@@ -322,7 +336,7 @@ void playlist_length(Library library, int *playlistMinutes, int *playlistSeconds
         *playlistSeconds = -1;
     }
 
-    while (cur != NULL)
+    while (cur != NULL && cur->isSelected == TRUE)
     {
         Track curT = cur->tracks;
         while (curT != NULL)
@@ -335,7 +349,7 @@ void playlist_length(Library library, int *playlistMinutes, int *playlistSeconds
     }
     if (*playlistSeconds > 59)
     {
-        *playlistMinutes = *playlistSeconds / 60;
+        *playlistMinutes = *playlistMinutes + *playlistSeconds / 60;
         *playlistSeconds = *playlistSeconds % 60;
     }
 }
@@ -361,9 +375,10 @@ void delete_track(Library library, char track[MAX_LEN])
         if (cur->isSelected)
         {
             Track curT = cur->tracks;
-            
+
             // if selected list have not any tracks
-            if (curT == NULL){
+            if (curT == NULL)
+            {
                 return;
             }
             // if curT is a head_node
@@ -607,7 +622,8 @@ void soundex_search(Library library, char artist[MAX_LEN])
 // to a new Playlist.
 int add_filtered_playlist(Library library, char artist[MAX_LEN])
 {
-    if (!is_valid(artist)){
+    if (!is_valid(artist))
+    {
         return ERROR_INVALID_INPUTS;
     }
     // add a new playlist to save Soundex
@@ -617,7 +633,8 @@ int add_filtered_playlist(Library library, char artist[MAX_LEN])
     char sound[MAX_LEN];
     map(artist, sound);
     Playlist playlist = library->head;
-    if (playlist == NULL){
+    if (playlist == NULL)
+    {
         return ERROR_NOT_FOUND;
     }
     while (playlist->next != NULL)
