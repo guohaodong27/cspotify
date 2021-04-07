@@ -39,12 +39,12 @@ void test_add_playlist(void) {
         return;
     }
 
-    //char printText[MAX_LEN];
-    // CAPTURE(print_library(testLibrary), printText, MAX_LEN);
-    // if (!string_contains(printText, "Favourites")) {
-    //     printf("DOES NOT MEET SPEC\n");
-    //     return;
-    // }
+    char printText[MAX_LEN];
+    CAPTURE(print_library(testLibrary), printText, MAX_LEN);
+    if (!string_contains(printText, "Favourites")) {
+        printf("DOES NOT MEET SPEC\n");
+        return;
+    }
 
     // Test 2: Does add_playlist return ERROR_INVALID_INPUTS
     // and not add the playlist into the Library
@@ -78,6 +78,13 @@ void test_rename_playlist(void) {
         return;
     }
 
+    // Test 3: Does rename_playlist return INVALID
+    int result3 = rename_playlist(testLibrary,"Favourites","%%");
+    if (result3 != ERROR_INVALID_INPUTS) {
+        printf("DOES NOT MEET SPEC\n");
+        return;
+    }
+
     // Test 2: Does rename_playlist successfully
     // rename a Playlist
     // when a valid new Playlist name is given to 
@@ -92,8 +99,7 @@ void test_rename_playlist(void) {
 
     
 
-    // Test 3: ???
-    // TODO: Add your own test, and explain it.
+
     delete_library(testLibrary);
     printf("MEETS SPEC\n");
 }
@@ -105,16 +111,31 @@ void test_rename_playlist(void) {
 
 // Test function for 'add_track'
 void test_add_track(void) {
+    Library testLibrary = create_library();
+    // Test 3: Does add_track NOTFOUND
+    int result3 = add_track(testLibrary,"%iveHunderdMiles","Justin",206,0);
+    if (result3 != ERROR_NOT_FOUND){
+        printf("DOES NOT MEET SPEC\n");
+        return;
+    }
+
+    // Test 2: Does add_track return INVALID
+    int result2 = add_track(testLibrary,"%iveHunderdMiles","Justin",206,0);
+    if (result2 != ERROR_INVALID_INPUTS){
+        printf("DOES NOT MEET SPEC\n");
+        return;
+    }
     // Test 1: Does add_track successfully add 
     // multiple (more than 3 Tracks) Tracks 
     // to the Library?
-    Library testLibrary = create_library();
     add_playlist(testLibrary,"Favourites");   
     int result = add_track(testLibrary,"FiveHunderdMiles","Justin",206,0);
     if (result != SUCCESS) {
         printf("DOES NOT MEET SPEC\n");
         return;
     }
+
+
     delete_library(testLibrary);
     printf("MEETS SPEC\n");
 }
@@ -134,7 +155,7 @@ void test_playlist_length(void) {
     if (!(second == 32 && minitus == 8)){
         printf("DOES NOT MEET SPEC\n");
     }else{
-        printf("MEET SPEC\n");
+        printf("MEETS SPEC\n");
     }
 
 
@@ -162,7 +183,7 @@ void test_delete_playlist(void) {
     if (res != ERROR_NOT_FOUND){
         printf("DOES NOT MEET SPEC\n");
     }else{
-        printf("MEET SPEC\n");
+        printf("MEETS SPEC\n");
     }
 
 
