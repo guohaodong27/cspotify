@@ -302,7 +302,7 @@ int add_track(Library library, char title[MAX_LEN], char artist[MAX_LEN],
     // find insert point
     Track insertPointPre = insterPosition->tracks;
     Track insertPointAfter = insterPosition->tracks;
-    if (insertPointPre != NULL)
+    if (insertPointPre != NULL && position != 0)
     {
         insertPointAfter = insterPosition->tracks->next;
         for (int i = 1; i < position && insertPointPre != NULL; i++)
@@ -327,6 +327,7 @@ int add_track(Library library, char title[MAX_LEN], char artist[MAX_LEN],
             free(insertT);
             return ERROR_INVALID_INPUTS;
         }
+        // add to the first track
         insterPosition->tracks = insertT;
     }
     insertT->next = insertPointAfter;
