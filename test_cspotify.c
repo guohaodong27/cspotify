@@ -133,6 +133,8 @@ void test_playlist_length(void) {
     playlist_length(testLibrary,&minitus,&second);
     if (!(second == 32 && minitus == 8)){
         printf("DOES NOT MEET SPEC\n");
+    }else{
+        printf("MEET SPEC\n");
     }
 
 
@@ -159,6 +161,8 @@ void test_delete_playlist(void) {
     int res = rename_playlist(testLibrary,"Favourites","test");
     if (res != ERROR_NOT_FOUND){
         printf("DOES NOT MEET SPEC\n");
+    }else{
+        printf("MEET SPEC\n");
     }
 
 
