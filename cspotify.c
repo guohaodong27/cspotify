@@ -314,12 +314,19 @@ int add_track(Library library, char title[MAX_LEN], char artist[MAX_LEN],
         }
         // don't find insert point (the length greater than len)
         if (insertPointPre == NULL){
+            free(insertT);
             return ERROR_INVALID_INPUTS;
         }
         insertPointPre->next = insertT;
     }
     else
     {
+        // the list tracks is empty
+        // positoin is valid?
+        if (position > 0){
+            free(insertT);
+            return ERROR_INVALID_INPUTS;
+        }
         insterPosition->tracks = insertT;
     }
     insertT->next = insertPointAfter;

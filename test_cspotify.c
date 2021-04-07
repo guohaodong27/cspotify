@@ -139,7 +139,6 @@ void test_playlist_length(void) {
     // Test 2: ???
     // TODO: Add your own test, and explain it.
     delete_library(testLibrary);
-    printf("MEETS SPEC\n");
 }
 
 
