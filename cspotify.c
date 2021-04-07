@@ -280,7 +280,8 @@ int add_track(Library library, char title[MAX_LEN], char artist[MAX_LEN],
     }
 
     // check length is invalid
-    if (trackLengthInSec <1 || position < 0){
+    if (trackLengthInSec < 1 || position < 0)
+    {
         return ERROR_INVALID_INPUTS;
     }
     // find playlist
@@ -308,12 +309,14 @@ int add_track(Library library, char title[MAX_LEN], char artist[MAX_LEN],
         for (int i = 1; i < position && insertPointPre != NULL; i++)
         {
             insertPointPre = insertPointAfter;
-            if (insertPointAfter != NULL){
+            if (insertPointAfter != NULL)
+            {
                 insertPointAfter = insertPointAfter->next;
             }
         }
         // don't find insert point (the length greater than len)
-        if (insertPointPre == NULL){
+        if (insertPointPre == NULL)
+        {
             free(insertT);
             return ERROR_INVALID_INPUTS;
         }
@@ -323,7 +326,8 @@ int add_track(Library library, char title[MAX_LEN], char artist[MAX_LEN],
     {
         // the list tracks is empty
         // positoin is valid?
-        if (position > 0){
+        if (position > 0)
+        {
             free(insertT);
             return ERROR_INVALID_INPUTS;
         }
@@ -422,64 +426,43 @@ void delete_track(Library library, char track[MAX_LEN])
 /** 
  * select next list if next if null ,select head
  */
-void select_next_helper(Library library,Playlist playlist){
-    if (playlist == NULL){
+void select_next_helper(Library library, Playlist playlist)
+{
+    if (playlist == NULL)
+    {
         return;
     }
-        if(playlist->next != NULL){
-            playlist->isSelected = FALSE;
-            playlist->next->isSelected = TRUE;
-    }else{
-        playlist->isSelected = FALSE;
+    playlist->isSelected = FALSE;
+    if (playlist->next != NULL)
+    {
+        playlist->next->isSelected = TRUE;
+    }
+    else if(library->head != NULL)
+    {
         library->head->isSelected = TRUE;
     }
-
-    
 }
-void free_playlist(Playlist playlist);
-void my_delete(Library library){
-    // if library is empty
-    if (library->head == NULL){
-        return;
-    }
 
-    // search the selected
-    Playlist curP = library->head;
-    Playlist preP = NULL;
-    /**
-     * find selected list and repoint previous next point
-     */
-    // if first is selected
-    if (curP->isSelected == TRUE){
-        library->head = curP->next;
-        // unnecessary free tracks
-    }else{
-        while (curP != NULL && !curP->isSelected)
-        {
-            preP = curP;
-            curP = curP->next;
-        }
-        preP->next = curP->next;
-        // free tracks
-        free_playlist(curP);
-    }
-    select_next_helper(library,curP);
-    free(curP);
-}
-void free_playlist(Playlist playlist){
+void free_playlist(Playlist playlist)
+{
     // if playlist is null
-    if (playlist == NULL){
+    if (playlist == NULL)
+    {
         return;
     }
 
     // free playlist
-    if (playlist->tracks == NULL){
+    if (playlist->tracks == NULL)
+    {
         return;
-    }else{
+    }
+    else
+    {
         Track curT = playlist->tracks;
         Track nextT = NULL;
         // free curT and recoder curT->next to nextT;
-        while (curT != NULL){
+        while (curT != NULL)
+        {
             nextT = curT->next;
             free(curT);
             curT = nextT;
@@ -491,83 +474,37 @@ void free_playlist(Playlist playlist){
 // Delete the selected Playlist and select the next Playlist in the Library.
 void delete_playlist(Library library)
 {
-    my_delete(library);
-    // Playlist cur = library->head;
-    // if (cur == NULL)
-    // {
-    //     return;
-    // }
-    // // del_node in cur playlist
-    // if (cur != NULL && !cur->isSelected)
-    // {
-    //     library->head = cur->next;
-    //     library->selected = cur->next;
-    //     Playlist newLast = library->head;
+    // if library is empty
+    if (library->head == NULL)
+    {
+        return;
+    }
 
-    //     // update last point
-    //     while (newLast != NULL && newLast->next != NULL)
-    //     {
-    //         newLast = newLast->next;
-    //     }
-    //     library->last = newLast;
-
-    //     // update selected point
-    //     if (library->selected != NULL)
-    //     {
-    //         library->selected->isSelected = TRUE;
-    //     }
-
-    //     // relase cur playlist
-    //     if (cur->tracks != NULL)
-    //     {
-    //         Track curT = cur->tracks;
-    //         Track nextT = curT->next;
-    //         while (curT != NULL)
-    //         {
-    //             free(curT);
-    //             curT = nextT;
-    //             if (nextT != NULL)
-    //             {
-    //                 nextT = nextT->next;
-    //             }
-    //         }
-    //     }
-    //     free(cur);
-    //     return;
-    // }
-
-    // Playlist pre = cur;
-    // cur = cur->next;
-    // while (cur != NULL && !cur->isSelected)
-    // {
-    //     pre = cur;
-    //     cur = cur->next;
-    // }
-    // // free mem
-    // if (cur->tracks != NULL)
-    // {
-    //     Track curT = cur->tracks;
-    //     Track nextT = curT->next;
-    //     while (curT != NULL)
-    //     {
-    //         free(curT);
-    //         curT = nextT;
-    //         if (nextT != NULL)
-    //         {
-    //             nextT = nextT->next;
-    //         }
-    //     }
-    // }
-    // pre->next = cur->next;
-    // cur->next->isSelected = TRUE;
-    // library->selected = cur->next;
-    // free(cur);
-    // // select next playlist
-    // // if (cur != NULL)
-    // // {
-    // //     cur->isSelected = TRUE;
-    // //     library->selected = cur;
-    // // }
+    // search the selected
+    Playlist curP = library->head;
+    Playlist preP = NULL;
+    /**
+     * find selected list and repoint previous next point
+     */
+    // if first is selected
+    if (curP->isSelected == TRUE)
+    {
+        library->head = curP->next;
+        // unnecessary free tracks
+    }
+    else
+    {
+        while (curP != NULL && !curP->isSelected)
+        {
+            preP = curP;
+            curP = curP->next;
+        }
+        preP->next = curP->next;
+        // free tracks
+        free_playlist(curP);
+    }
+    select_next_helper(library, curP);
+    free(curP);
 }
 
 // Delete an entire Library and its associated Playlists and Tracks.
