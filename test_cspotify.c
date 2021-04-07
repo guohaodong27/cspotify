@@ -165,7 +165,6 @@ void test_delete_playlist(void) {
     // Test 2: ???
     // TODO: Add your own test, and explain it.
     delete_library(testLibrary);
-    printf("MEETS SPEC\n");
 }
 
 //　Test function for 'delte_track'
